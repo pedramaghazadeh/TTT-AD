@@ -1,0 +1,22 @@
+Loading dataset from /scr/Pedram/VisualLearning/processed_bdd100k/train/
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 7040/7040 [00:23<00:00, 299.78it/s]
+Traceback (most recent call last):
+  File "/home/pedram/VisualLearning/TTT-AD/main.py", line 37, in <module>
+    train_model(args)
+  File "/home/pedram/VisualLearning/TTT-AD/main.py", line 18, in train_model
+    loader = DataLoader(dataset, batch_size=32, shuffle=True, num_workers=32)
+  File "/home/pedram/miniconda3/envs/ece285/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 385, in __init__
+    sampler = RandomSampler(dataset, generator=generator)  # type: ignore[arg-type]
+  File "/home/pedram/miniconda3/envs/ece285/lib/python3.9/site-packages/torch/utils/data/sampler.py", line 156, in __init__
+    raise ValueError(
+ValueError: num_samples should be a positive integer value, but got num_samples=0
+Traceback (most recent call last):
+  File "/home/pedram/VisualLearning/TTT-AD/main.py", line 37, in <module>
+    train_model(args)
+  File "/home/pedram/VisualLearning/TTT-AD/main.py", line 18, in train_model
+    loader = DataLoader(dataset, batch_size=32, shuffle=True, num_workers=32)
+  File "/home/pedram/miniconda3/envs/ece285/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 385, in __init__
+    sampler = RandomSampler(dataset, generator=generator)  # type: ignore[arg-type]
+  File "/home/pedram/miniconda3/envs/ece285/lib/python3.9/site-packages/torch/utils/data/sampler.py", line 156, in __init__
+    raise ValueError(
+ValueError: num_samples should be a positive integer value, but got num_samples=0

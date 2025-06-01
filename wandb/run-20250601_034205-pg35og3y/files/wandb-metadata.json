@@ -1,0 +1,60 @@
+{
+  "os": "Linux-5.15.0-113-generic-x86_64-with-glibc2.35",
+  "python": "CPython 3.9.22",
+  "startedAt": "2025-06-01T03:42:05.400975Z",
+  "program": "/home/pedram/VisualLearning/TTT-AD/main.py",
+  "codePath": "main.py",
+  "git": {
+    "remote": "https://github.com/pedramaghazadeh/TTT-AD.git",
+    "commit": "f29fa90cf9a924599d99117ea84a7cd01dfd7fa7"
+  },
+  "email": "paghazadeh@ucsd.edu",
+  "root": "/home/pedram/VisualLearning/TTT-AD",
+  "host": "acesxpu",
+  "executable": "/home/pedram/miniconda3/envs/ece285/bin/python",
+  "codePathLocal": "main.py",
+  "cpu_count": 64,
+  "cpu_count_logical": 128,
+  "gpu": "NVIDIA RTX A6000",
+  "gpu_count": 4,
+  "disk": {
+    "/": {
+      "total": "4018594422784",
+      "used": "3407612227584"
+    }
+  },
+  "memory": {
+    "total": "1081796214784"
+  },
+  "cpu": {
+    "count": 64,
+    "countLogical": 128
+  },
+  "gpu_nvidia": [
+    {
+      "name": "NVIDIA RTX A6000",
+      "memoryTotal": "51527024640",
+      "cudaCores": 10752,
+      "architecture": "Ampere"
+    },
+    {
+      "name": "NVIDIA RTX A6000",
+      "memoryTotal": "51527024640",
+      "cudaCores": 10752,
+      "architecture": "Ampere"
+    },
+    {
+      "name": "NVIDIA RTX A6000",
+      "memoryTotal": "51527024640",
+      "cudaCores": 10752,
+      "architecture": "Ampere"
+    },
+    {
+      "name": "NVIDIA RTX A6000",
+      "memoryTotal": "51527024640",
+      "cudaCores": 10752,
+      "architecture": "Ampere"
+    }
+  ],
+  "cudaVersion": "12.2"
+}

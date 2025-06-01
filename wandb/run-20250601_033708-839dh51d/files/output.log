@@ -1,0 +1,17 @@
+Loading dataset from /scr/Pedram/VisualLearning/processed_bdd100k/train/
+Traceback (most recent call last):
+  File "/home/pedram/VisualLearning/TTT-AD/main.py", line 37, in <module>
+    train_model(args)
+  File "/home/pedram/VisualLearning/TTT-AD/main.py", line 17, in train_model
+    dataset = BDDDualTaskDataset(root_path=args.data_path)
+  File "/home/pedram/VisualLearning/TTT-AD/dataloader.py", line 31, in __init__
+    self.labels = json.load(open(os.path.join(self.label_dir, "labels.json"), 'r'))
+AttributeError: 'BDDDualTaskDataset' object has no attribute 'label_dir'
+Traceback (most recent call last):
+  File "/home/pedram/VisualLearning/TTT-AD/main.py", line 37, in <module>
+    train_model(args)
+  File "/home/pedram/VisualLearning/TTT-AD/main.py", line 17, in train_model
+    dataset = BDDDualTaskDataset(root_path=args.data_path)
+  File "/home/pedram/VisualLearning/TTT-AD/dataloader.py", line 31, in __init__
+    self.labels = json.load(open(os.path.join(self.label_dir, "labels.json"), 'r'))
+AttributeError: 'BDDDualTaskDataset' object has no attribute 'label_dir'

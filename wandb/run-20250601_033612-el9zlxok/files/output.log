@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/home/pedram/VisualLearning/TTT-AD/main.py", line 37, in <module>
+    train_model(args)
+  File "/home/pedram/VisualLearning/TTT-AD/main.py", line 17, in train_model
+    dataset = BDDDualTaskDataset(root_path=args.data_path)
+  File "/home/pedram/VisualLearning/TTT-AD/dataloader.py", line 25, in __init__
+    print(f"Loading dataset images from {self.image_dir} and labels from {self.label_dir}")
+AttributeError: 'BDDDualTaskDataset' object has no attribute 'image_dir'
+Traceback (most recent call last):
+  File "/home/pedram/VisualLearning/TTT-AD/main.py", line 37, in <module>
+    train_model(args)
+  File "/home/pedram/VisualLearning/TTT-AD/main.py", line 17, in train_model
+    dataset = BDDDualTaskDataset(root_path=args.data_path)
+  File "/home/pedram/VisualLearning/TTT-AD/dataloader.py", line 25, in __init__
+    print(f"Loading dataset images from {self.image_dir} and labels from {self.label_dir}")
+AttributeError: 'BDDDualTaskDataset' object has no attribute 'image_dir'

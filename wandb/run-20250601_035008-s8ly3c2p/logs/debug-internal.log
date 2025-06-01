@@ -1,0 +1,15 @@
+{"time":"2025-06-01T03:50:08.219884563Z","level":"INFO","msg":"stream: starting","core version":"0.19.11","symlink path":"/home/pedram/VisualLearning/TTT-AD/wandb/run-20250601_035008-s8ly3c2p/logs/debug-core.log"}
+{"time":"2025-06-01T03:50:08.453305353Z","level":"INFO","msg":"created new stream","id":"s8ly3c2p"}
+{"time":"2025-06-01T03:50:08.453366609Z","level":"INFO","msg":"stream: started","id":"s8ly3c2p"}
+{"time":"2025-06-01T03:50:08.453489444Z","level":"INFO","msg":"writer: Do: started","stream_id":"s8ly3c2p"}
+{"time":"2025-06-01T03:50:08.453607536Z","level":"INFO","msg":"handler: started","stream_id":"s8ly3c2p"}
+{"time":"2025-06-01T03:50:08.453700146Z","level":"INFO","msg":"sender: started","stream_id":"s8ly3c2p"}
+{"time":"2025-06-01T03:50:08.62573601Z","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-06-01T03:55:15.159362152Z","level":"INFO","msg":"stream: closing","id":"s8ly3c2p"}
+{"time":"2025-06-01T03:55:15.159439166Z","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-06-01T03:55:15.15950963Z","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-06-01T03:55:15.644181036Z","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-06-01T03:55:15.914284613Z","level":"INFO","msg":"handler: closed","stream_id":"s8ly3c2p"}
+{"time":"2025-06-01T03:55:15.914377374Z","level":"INFO","msg":"writer: Close: closed","stream_id":"s8ly3c2p"}
+{"time":"2025-06-01T03:55:15.914451652Z","level":"INFO","msg":"sender: closed","stream_id":"s8ly3c2p"}
+{"time":"2025-06-01T03:55:15.914548298Z","level":"INFO","msg":"stream: closed","id":"s8ly3c2p"}
