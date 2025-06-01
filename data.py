@@ -62,12 +62,12 @@ class BDDDualTaskDataset(Dataset):
         rotated = image.rotate(angle, resample=Image.BILINEAR)
 
         image_tensor = self.transform(image)
-        image_rot_tensor = self.transform(rotated / 360)  # Normalize angle to [0, 1]
+        image_rot_tensor = self.transform(rotated)
 
         return {"image": image_tensor, 
                 "label": torch.tensor(label), 
                 "image_rot": image_rot_tensor, 
-                "angle": torch.tensor([angle], dtype=torch.float32)
+                "angle": torch.tensor([angle / 360], dtype=torch.float32) # Normalized angle to [0, 1]
                 }
 
 
