@@ -18,8 +18,8 @@ SCENE2ID = {k: i for i, k in enumerate(SCENE_LABELS)}
 ID2SCENE = {i: k for i, k in enumerate(SCENE_LABELS)}
 
 class BDDDualTaskDataset(Dataset):
-    def __init__(self, root_path, input_size=224):
-        self.root = root_path
+    def __init__(self, root_path, parition="train", input_size=224):
+        self.root = os.path.join(root_path, parition + '/')
         self.input_size = input_size
         assert os.path.exists(self.root), f"Data directory {self.root} does not exist."
         print(f"Loading dataset from {self.root}")
@@ -62,7 +62,7 @@ class BDDDualTaskDataset(Dataset):
         rotated = image.rotate(angle, resample=Image.BILINEAR)
 
         image_tensor = self.transform(image)
-        image_rot_tensor = self.transform(rotated)
+        image_rot_tensor = self.transform(rotated / 360)  # Normalize angle to [0, 1]
 
         return {"image": image_tensor, 
                 "label": torch.tensor(label), 
@@ -84,7 +84,7 @@ def prepare_BDD(image_dir, label_dir, save_path, input_size=224, num_samples=5_0
     samples = []
     class_names = set()
 
-    for fname in tqdm(os.listdir(image_dir)[:num_samples]):
+    for fname in tqdm(os.listdir(image_dir)[5000:]):
         if fname.endswith('.jpg') or fname.endswith('.png'):
             img_path = os.path.join(image_dir, fname)
             image = Image.open(img_path)
@@ -119,7 +119,10 @@ def prepare_BDD(image_dir, label_dir, save_path, input_size=224, num_samples=5_0
                         class_names.add(class_name)
                         samples.append((crop, SCENE2ID[class_name]))
                         count += 1
-                        
+        if len(samples) == num_samples:
+            print(f"Reached the limit of {num_samples} samples.")
+            break
+       
     print(f"Found {len(class_names)} unique classes: {class_names} and a total of {len(samples)} samples.")
     if not os.path.exists(save_path):
         os.makedirs(save_path)
@@ -138,26 +141,13 @@ def prepare_BDD(image_dir, label_dir, save_path, input_size=224, num_samples=5_0
 
 
 if __name__ == "__main__":
-    from torch.utils.data import DataLoader
+    parition = 'val'  # or 'val', 'test'
 
+    # Note: Test set of BDD-100k doesn't have annotations, so we will use the second half of validation set for testing.
     prepare_BDD(
-        image_dir='/scr/Pedram/VisualLearning/bdd100k/bdd100k-images/train/img/',
-        label_dir='/scr/Pedram/VisualLearning/bdd100k/bdd100k-images/train/ann/',
-        save_path='/scr/Pedram/VisualLearning/processed_bdd100k/train',
+        image_dir=f'/scr/Pedram/VisualLearning/bdd100k/bdd100k-images/{parition}/img/',
+        label_dir=f'/scr/Pedram/VisualLearning/bdd100k/bdd100k-images/{parition}/ann/',
+        save_path=f'/scr/Pedram/VisualLearning/processed_bdd100k/{parition}',
         input_size=224,
         num_samples=5_000,
     )
-
-    # train_set = BDDDualTaskDataset(
-    #     image_dir='/scr/Pedram/VisualLearning/bdd100k/bdd100k-images/train/img/',
-    #     label_dir='/scr/Pedram/VisualLearning/bdd100k/bdd100k-images/train/ann/'
-    # )
-
-    # trainloader = DataLoader(train_set, batch_size=32, shuffle=True, num_workers=32)
-
-    # for batch in trainloader:
-    #     images, class_labels, rotation_angles = batch
-    #     print(images.shape)  # [B, 3, 224, 224]
-    #     print(class_labels)  # [B]
-    #     print(rotation_angles)  # [B, 1]
-    #     break
