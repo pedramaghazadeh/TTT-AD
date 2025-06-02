@@ -18,14 +18,14 @@ class EfficientNetTTT(nn.Module):
             self.rotation_head = nn.Sequential(
                 nn.Linear(self.feature_dim_rot, 128),
                 nn.ReLU(),
-                nn.Linear(128, 1)  # Regression: rotation in degrees
+                nn.Linear(128, 4), # Classification: 4 classes for 0, 90, 180, 270 degrees
             )
         else:
             self.encoder_rotation = self.encoder
             self.rotation_head = nn.Sequential(
                 nn.Linear(self.feature_dim, 128),
                 nn.ReLU(),
-                nn.Linear(128, 1)  # Regression: rotation in degrees
+                nn.Linear(128, 4), # Classification: 4 classes for 0, 90, 180, 270 degrees
             )
 
     def forward(self, x):
@@ -35,9 +35,3 @@ class EfficientNetTTT(nn.Module):
         feats_rot = self.encoder_rotation(x)
         rot_pred = self.rotation_head(feats_rot)
         return cls_logits, rot_pred
-
-# def extractor_from_layer4(net):
-# 	layers = [net.conv1, net.bn1, net.relu, net.maxpool,
-# 				 net.layer1, net.layer2, net.layer3, net.layer4, 
-# 					net.avgpool, ViewFlatten()]
-# 	return nn.Sequential(*layers)

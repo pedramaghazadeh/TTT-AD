@@ -19,14 +19,14 @@ def train_model(args):
     wandb.define_metric("test/*", step_metric="test/step")
     wandb.define_metric("ttt/*", step_metric="ttt/step")
 
-    dataset = BDDDualTaskDataset(root_path=args.data_path, parition="train")
+    dataset = BDDDualTaskDataset(root_path=args.data_path, partition="train")
     train_dataloader = DataLoader(dataset, batch_size=32, shuffle=True, num_workers=32)
 
     # Validation dataset
-    val_dataset = BDDDualTaskDataset(root_path=args.data_path, parition="val")
+    val_dataset = BDDDualTaskDataset(root_path=args.data_path, partition="val")
     val_dataloader = DataLoader(val_dataset, batch_size=32, shuffle=False, num_workers=32)
     # Test dataset
-    test_dataset = BDDDualTaskDataset(root_path=args.data_path, parition="test")
+    test_dataset = BDDDualTaskDataset(root_path=args.data_path, partition="test")
     test_dataloader = DataLoader(test_dataset, batch_size=32, shuffle=False, num_workers=32)
 
     print(f"Train dataset size: {len(dataset)}")
@@ -35,7 +35,7 @@ def train_model(args):
 
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
 
-    for _ in tqdm(range(10), desc="Training and validating"):
+    for _ in tqdm(range(args.num_epochs), desc="Training and validating"):
         # Training
         train_epoch(model, train_dataloader, optimizer, device)
         # Validation
@@ -46,14 +46,16 @@ def train_model(args):
 
     # TTT on test dataset
     for partition in CORRUPTED:
-        corrupted_dataset = BDDDualTaskDataset(root_path=args.data_path, parition=partition, batch_size=1, num_samples=1000)
-        test_time_training_inference(model, corrupted_dataset, device, partition)
+        corrupted_dataset = BDDDualTaskDataset(root_path=args.data_path, partition=partition, num_samples=1000)
+        corrupted_dataloader = DataLoader(corrupted_dataset, batch_size=1, shuffle=False, num_workers=32)
+        test_time_training_inference(model, corrupted_dataloader, device, partition)
     # torch.save(model.state_dict(), f"model_.pth")
     
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train EfficientNet for TTT")
     parser.add_argument('--device', type=int, default=0, help='GPU device ID')
     parser.add_argument('--data-path', type=str, default='/scr/Pedram/VisualLearning/processed_bdd100k/', help='Path to the dataset')
+    parser.add_argument('--num-epochs', type=int, default=2, help='Number of training epochs')
 
     args = parser.parse_args()
 

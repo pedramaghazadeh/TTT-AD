@@ -18,8 +18,8 @@ SCENE2ID = {k: i for i, k in enumerate(SCENE_LABELS)}
 ID2SCENE = {i: k for i, k in enumerate(SCENE_LABELS)}
 
 class BDDDualTaskDataset(Dataset):
-    def __init__(self, root_path, parition="train", input_size=224):
-        self.root = os.path.join(root_path, parition + '/')
+    def __init__(self, root_path, partition="train", input_size=224):
+        self.root = os.path.join(root_path, partition + '/')
         self.input_size = input_size
         assert os.path.exists(self.root), f"Data directory {self.root} does not exist."
         print(f"Loading dataset from {self.root}")
@@ -50,7 +50,7 @@ class BDDDualTaskDataset(Dataset):
             T.Normalize(mean=mean, std=std)
         ])
 
-        print("Total data available is", len(self.samples))
+        print(f"Total data available is {len(self.samples)} images in {partition} parition", )
 
     def __len__(self):
         return len(self.samples)
@@ -58,7 +58,9 @@ class BDDDualTaskDataset(Dataset):
     def __getitem__(self, idx):
         image, label = self.samples[idx]
         # Random rotation
-        angle = random.uniform(0, 360)
+        # angle = random.uniform(0, 360)
+        angle = random.choice([0, 90, 180, 270]) # For simplicity, we can limit to these angles
+        labels_angle = {0: 0, 90: 1, 180: 2, 270: 3}
         rotated = image.rotate(angle, resample=Image.BILINEAR)
 
         image_tensor = self.transform(image)
@@ -67,7 +69,7 @@ class BDDDualTaskDataset(Dataset):
         return {"image": image_tensor, 
                 "label": torch.tensor(label), 
                 "image_rot": image_rot_tensor, 
-                "angle": torch.tensor([angle / 360], dtype=torch.float32) # Normalized angle to [0, 1]
+                "angle": torch.tensor(labels_angle[angle]) # Normalized angle to [0, 1]
                 }
 
 

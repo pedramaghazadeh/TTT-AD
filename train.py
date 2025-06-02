@@ -13,8 +13,8 @@ def train_epoch(model, dataloader, optimizer, device, ttt=True):
     model.train()
     cls_loss_fn = nn.CrossEntropyLoss()
 
-    rot_loss_fn = nn.MSELoss()
-    # rot_loss_fn = nn.CrossEntropyLoss()
+    # rot_loss_fn = nn.MSELoss()
+    rot_loss_fn = nn.CrossEntropyLoss()
 
     total_cls_loss, total_rot_loss = 0, 0
     total_acc = 0
@@ -56,7 +56,9 @@ def train_epoch(model, dataloader, optimizer, device, ttt=True):
 def validate_epoch(model, dataloader, device):
     model.eval()
     cls_loss_fn = nn.CrossEntropyLoss()
-    rot_loss_fn = nn.MSELoss()
+    # rot_loss_fn = nn.MSELoss()
+    rot_loss_fn = nn.CrossEntropyLoss()
+
     total_cls_loss, total_rot_loss = 0, 0
     total_acc = 0
     global val_step
@@ -84,7 +86,9 @@ def validate_epoch(model, dataloader, device):
 def test_epoch(model, dataloader, device):
     model.eval()
     cls_loss_fn = nn.CrossEntropyLoss()
-    rot_loss_fn = nn.MSELoss()
+    # rot_loss_fn = nn.MSELoss()
+    rot_loss_fn = nn.CrossEntropyLoss()
+
     total_cls_loss, total_rot_loss = 0, 0
     total_acc = 0
     global test_step
@@ -115,7 +119,9 @@ def test_time_training_inference(model, dataloader, device, num_iterations=100):
     ttt_model.train()
     acc = 0
     optimizer = torch.optim.Adam(ttt_model.parameters(), lr=1e-4)
-    rot_loss_fn = nn.MSELoss()
+    # rot_loss_fn = nn.MSELoss()
+    rot_loss_fn = nn.CrossEntropyLoss()
+
     global ttt_step
     for batch in dataloader:
         # Batch size of 1
