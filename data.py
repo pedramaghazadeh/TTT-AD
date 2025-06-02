@@ -59,8 +59,7 @@ class BDDDualTaskDataset(Dataset):
         image, label = self.samples[idx]
         # Random rotation
         # angle = random.uniform(0, 360)
-        angle = random.choice([0, 90, 180, 270]) # For simplicity, we can limit to these angles
-        labels_angle = {0: 0, 90: 1, 180: 2, 270: 3}
+        angle = np.random.randint(0, 4) * 90
         rotated = image.rotate(angle, resample=Image.BILINEAR)
 
         image_tensor = self.transform(image)
@@ -69,7 +68,7 @@ class BDDDualTaskDataset(Dataset):
         return {"image": image_tensor, 
                 "label": torch.tensor(label), 
                 "image_rot": image_rot_tensor, 
-                "angle": torch.tensor(labels_angle[angle]) # Normalized angle to [0, 1]
+                "angle": torch.tensor(angle // 90, dtype=torch.long)
                 }
 
 

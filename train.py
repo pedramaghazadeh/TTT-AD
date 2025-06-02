@@ -6,6 +6,7 @@ import numpy as np
 
 from PIL import Image
 from tqdm import tqdm
+from copy import deepcopy
 
 train_step, val_step, test_step, ttt_step = 0, 0, 0, 0
 
@@ -20,15 +21,15 @@ def train_epoch(model, dataloader, optimizer, device, ttt=True):
     total_acc = 0
     global train_step
     for batch in dataloader:
-        x, label, angle = batch["image"].to(device), batch["label"].to(device), batch["angle"].to(device)
+        x, label, label_angle = batch["image"].to(device), batch["label"].to(device), batch["angle"].to(device)
 
         optimizer.zero_grad()
         
-        cls_logits, rot_pred = model(x)
+        cls_logits, rot_logits = model(x)
         
         cls_loss = cls_loss_fn(cls_logits, label)
         if ttt:
-            rot_loss = rot_loss_fn(rot_pred, angle)
+            rot_loss = rot_loss_fn(rot_logits, label_angle)
             loss = cls_loss.mean() + rot_loss.mean()
         else:
             loss = cls_loss.mean()
@@ -66,10 +67,10 @@ def validate_epoch(model, dataloader, device):
         for batch in dataloader:
             x, label, angle = batch["image"].to(device), batch["label"].to(device), batch["angle"].to(device)
 
-            cls_logits, rot_pred = model(x)
+            cls_logits, rot_logits = model(x)
 
             cls_loss = cls_loss_fn(cls_logits, label)
-            rot_loss = rot_loss_fn(rot_pred, angle)
+            rot_loss = rot_loss_fn(rot_logits, angle)
 
             total_cls_loss += cls_loss.item()
             total_rot_loss += rot_loss.item()
@@ -94,12 +95,12 @@ def test_epoch(model, dataloader, device):
     global test_step
     with torch.no_grad():
         for batch in dataloader:
-            x, label, angle = batch["image"].to(device), batch["label"].to(device), batch["angle"].to(device)
+            x, label, label_angle = batch["image"].to(device), batch["label"].to(device), batch["angle"].to(device)
 
-            cls_logits, rot_pred = model(x)
+            cls_logits, rot_logits = model(x)
 
             cls_loss = cls_loss_fn(cls_logits, label)
-            rot_loss = rot_loss_fn(rot_pred, angle)
+            rot_loss = rot_loss_fn(rot_logits, label_angle)
 
             total_cls_loss += cls_loss.item()
             total_rot_loss += rot_loss.item()
@@ -114,45 +115,37 @@ def test_epoch(model, dataloader, device):
     test_step += 1
     return total_cls_loss / len(dataloader), total_rot_loss / len(dataloader)
 
-def test_time_training_inference(model, dataloader, device, num_iterations=100):
+def test_time_training_inference(model, dataloader, device, num_iterations=10, online=False):
     # Train the model on this batch of data
-    ttt_model.train()
+    # ttt_model.train()
     acc = 0
-    optimizer = torch.optim.Adam(ttt_model.parameters(), lr=1e-4)
     # rot_loss_fn = nn.MSELoss()
     rot_loss_fn = nn.CrossEntropyLoss()
 
     global ttt_step
-    for batch in dataloader:
+    for batch in tqdm(dataloader):
         # Batch size of 1
-        ttt_model = model.copy()
+        if not online:
+            ttt_model = deepcopy(model)  # Create a copy of the model for TTT
         ttt_model.to(device)
+        optimizer = torch.optim.Adam(ttt_model.parameters(), lr=1e-4)
 
-        image, label, _, __ = batch["image"].to(device), batch["label"].to(device), batch["image_rot"], batch["angle"]
-        # Rotate the image to create multiple views
-
-        image = Image.fromarray(image.cpu().numpy().astype(np.uint8))
-        # Create 4 rotated versions of the image  
-        rotations = [0, 90, 180, 270]
-        images = [image.rotate(angle) for angle in rotations]
-        
-        image_tensors = torch.stack([torch.tensor(np.array(img).transpose(2, 0, 1), dtype=torch.float32) for img in images]).to(device)
-        rotation_labels = torch.tensor(rotations / 360, dtype=torch.float32).to(device)
-        
+        image, label, image_rot, label_angle = batch["image"].to(device), batch["label"].to(device), batch["image_rot"].to(device), batch["angle"].to(device)
+    
         # Train the model
         for _ in range(num_iterations):
             optimizer.zero_grad()
-            cls_logits, rot_pred = ttt_model(image_tensors)
-            rot_loss = rot_loss_fn(rot_pred, rotation_labels)
+            cls_logits, rot_logits = ttt_model(image)
+            rot_loss = rot_loss_fn(rot_logits, label_angle)
             rot_loss.backward()
             optimizer.step()
+            wandb.log({"ttt/rot_loss": rot_loss.item(), "ttt/step": ttt_step})
+            ttt_step += 1
 
         # Predict the output for the original image
-        ttt_model.eval()
-        with torch.no_grad():
-            cls_logits, rot_pred = ttt_model(image.to(device).unsqueeze(0))
-            class_pred = cls_logits.argmax(dim=1)
-            acc += (class_pred == label).float().mean().item()
+        cls_logits, rot_logits = ttt_model(image)
+        class_pred = cls_logits.argmax(dim=1)
+        acc += (class_pred == label).float().mean().item()
 
     wandb.log({"ttt/accuracy": acc / len(dataloader), "ttt/step": ttt_step})
     ttt_step += 1
