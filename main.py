@@ -6,13 +6,18 @@ from model import *
 from train import *
 from data import *
 
-
+CORRUPTED = ["blur", "fog", "rain", "snow", "sun_flare", "test"]
 
 def train_model(args):
     device = torch.device(f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu')
     model = EfficientNetTTT(num_classes=10).to(device)
     wandb.init(project="ttt-ad", name="ttt-ad-training", config=args)
     wandb.watch(model, log="all")
+
+    wandb.define_metric("train/*", step_metric="train/step")
+    wandb.define_metric("val/*", step_metric="val/step")
+    wandb.define_metric("test/*", step_metric="test/step")
+    wandb.define_metric("ttt/*", step_metric="ttt/step")
 
     dataset = BDDDualTaskDataset(root_path=args.data_path, parition="train")
     train_dataloader = DataLoader(dataset, batch_size=32, shuffle=True, num_workers=32)
@@ -22,7 +27,7 @@ def train_model(args):
     val_dataloader = DataLoader(val_dataset, batch_size=32, shuffle=False, num_workers=32)
     # Test dataset
     test_dataset = BDDDualTaskDataset(root_path=args.data_path, parition="test")
-    test_dataloader = DataLoader(test_dataset, batch_size=1, shuffle=False, num_workers=32)
+    test_dataloader = DataLoader(test_dataset, batch_size=32, shuffle=False, num_workers=32)
 
     print(f"Train dataset size: {len(dataset)}")
     print(f"Validation dataset size: {len(val_dataset)}")
@@ -30,15 +35,19 @@ def train_model(args):
 
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
 
-    for epoch in range(10):
+    for _ in tqdm(range(10), desc="Training and validating"):
         # Training
         train_epoch(model, train_dataloader, optimizer, device)
         # Validation
         validate_epoch(model, val_dataloader, device)
-        # Test
-        test_epoch(model, test_dataloader, device)
+
+    # Test set
+    test_epoch(model, test_dataloader, device)
+
     # TTT on test dataset
-    test_time_training_inference(model, test_dataloader, device)
+    for partition in CORRUPTED:
+        corrupted_dataset = BDDDualTaskDataset(root_path=args.data_path, parition=partition, batch_size=1, num_samples=1000)
+        test_time_training_inference(model, corrupted_dataset, device, partition)
     # torch.save(model.state_dict(), f"model_.pth")
     
 if __name__ == "__main__":
