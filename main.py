@@ -19,30 +19,30 @@ def train_model(args):
     wandb.define_metric("test/*", step_metric="test/step")
     wandb.define_metric("ttt/*", step_metric="ttt/step")
 
-    # dataset = BDDDualTaskDataset(root_path=args.data_path, partition="train")
-    # train_dataloader = DataLoader(dataset, batch_size=32, shuffle=True, num_workers=32)
+    dataset = BDDDualTaskDataset(root_path=args.data_path, partition="train")
+    train_dataloader = DataLoader(dataset, batch_size=32, shuffle=True, num_workers=32)
 
-    # # Validation dataset
-    # val_dataset = BDDDualTaskDataset(root_path=args.data_path, partition="val")
-    # val_dataloader = DataLoader(val_dataset, batch_size=32, shuffle=False, num_workers=32)
-    # # Test dataset
-    # test_dataset = BDDDualTaskDataset(root_path=args.data_path, partition="test")
-    # test_dataloader = DataLoader(test_dataset, batch_size=32, shuffle=False, num_workers=32)
+    # Validation dataset
+    val_dataset = BDDDualTaskDataset(root_path=args.data_path, partition="val")
+    val_dataloader = DataLoader(val_dataset, batch_size=32, shuffle=False, num_workers=32)
+    # Test dataset
+    test_dataset = BDDDualTaskDataset(root_path=args.data_path, partition="test")
+    test_dataloader = DataLoader(test_dataset, batch_size=32, shuffle=False, num_workers=32)
 
-    # print(f"Train dataset size: {len(dataset)}")
-    # print(f"Validation dataset size: {len(val_dataset)}")
-    # print(f"Test dataset size: {len(test_dataset)}")
+    print(f"Train dataset size: {len(dataset)}")
+    print(f"Validation dataset size: {len(val_dataset)}")
+    print(f"Test dataset size: {len(test_dataset)}")
 
-    # optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
 
-    # for _ in tqdm(range(args.num_epochs), desc="Training and validating"):
-    #     # Training
-    #     train_epoch(model, train_dataloader, optimizer, device)
-    #     # Validation
-    #     validate_epoch(model, val_dataloader, device)
+    for _ in tqdm(range(args.num_epochs), desc="Training and validating"):
+        # Training
+        train_epoch(model, train_dataloader, optimizer, device)
+        # Validation
+        validate_epoch(model, val_dataloader, device)
 
     # Test set
-    # test_epoch(model, test_dataloader, device)
+    test_epoch(model, test_dataloader, device)
 
     # TTT on test dataset
     for partition in CORRUPTED:
