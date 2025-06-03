@@ -31,7 +31,5 @@ class EfficientNetTTT(nn.Module):
     def forward(self, x):
         feats = self.encoder(x)
         cls_logits = self.class_head(feats)
-
-        feats_rot = self.encoder_rotation(x)
-        rot_pred = self.rotation_head(feats_rot)
+        rot_pred = self.rotation_head(feats)
         return cls_logits, rot_pred

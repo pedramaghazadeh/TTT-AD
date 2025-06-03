@@ -18,7 +18,7 @@ SCENE2ID = {k: i for i, k in enumerate(SCENE_LABELS)}
 ID2SCENE = {i: k for i, k in enumerate(SCENE_LABELS)}
 
 class BDDDualTaskDataset(Dataset):
-    def __init__(self, root_path, partition="train", input_size=224):
+    def __init__(self, root_path, partition="train", input_size=224, max_samples=None):
         self.root = os.path.join(root_path, partition + '/')
         self.input_size = input_size
         assert os.path.exists(self.root), f"Data directory {self.root} does not exist."
@@ -32,7 +32,7 @@ class BDDDualTaskDataset(Dataset):
         self.labels = json.load(open(self.root + "labels.json", 'r'))
         self.labels = [item['label'] for item in self.labels]
 
-        for fname in tqdm(os.listdir(self.root)):
+        for fname in tqdm(sorted(os.listdir(self.root))):
             if fname.endswith('.jpg'):
                 image = Image.open(os.path.join(self.root, fname))
                 if image.mode != 'RGB':
@@ -40,6 +40,9 @@ class BDDDualTaskDataset(Dataset):
                 for channel in range(3):
                     vals[channel].extend(list(image.getdata(band=channel)))
                 self.samples.append((image, self.labels[int(fname.split('.')[0])]))
+
+        if max_samples is not None:
+            self.samples = self.samples[:max_samples]
 
         mean = [np.mean(vals[channel]) for channel in range(3)]
         std = [np.std(vals[channel]) for channel in range(3)]

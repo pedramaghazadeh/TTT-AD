@@ -33,7 +33,7 @@ def train_model(args):
     print(f"Validation dataset size: {len(val_dataset)}")
     print(f"Test dataset size: {len(test_dataset)}")
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 
     for _ in tqdm(range(args.num_epochs), desc="Training and validating"):
         # Training
@@ -46,16 +46,16 @@ def train_model(args):
 
     # TTT on test dataset
     for partition in CORRUPTED:
-        corrupted_dataset = BDDDualTaskDataset(root_path=args.data_path, partition=partition)
-        corrupted_dataloader = DataLoader(corrupted_dataset, batch_size=1, shuffle=False, num_workers=32)
-        test_time_training_inference(model, corrupted_dataloader, device)
-    # torch.save(model.state_dict(), f"model_.pth")
+        corrupted_dataset = BDDDualTaskDataset(root_path=args.data_path, partition=partition, max_samples=1000)
+        corrupted_dataloader = DataLoader(corrupted_dataset, batch_size=32, shuffle=False, num_workers=32)
+        test_time_training_inference(model, corrupted_dataloader, device, partition=partition)
+    torch.save(model.state_dict(), f"model_.pth")
     
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train EfficientNet for TTT")
     parser.add_argument('--device', type=int, default=0, help='GPU device ID')
     parser.add_argument('--data-path', type=str, default='/scr/Pedram/VisualLearning/processed_bdd100k/', help='Path to the dataset')
-    parser.add_argument('--num-epochs', type=int, default=2, help='Number of training epochs')
+    parser.add_argument('--num-epochs', type=int, default=10, help='Number of training epochs')
 
     args = parser.parse_args()
 
