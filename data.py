@@ -18,9 +18,10 @@ SCENE2ID = {k: i for i, k in enumerate(SCENE_LABELS)}
 ID2SCENE = {i: k for i, k in enumerate(SCENE_LABELS)}
 
 class BDDDualTaskDataset(Dataset):
-    def __init__(self, root_path, partition="train", input_size=224, max_samples=None):
+    def __init__(self, root_path, partition="train", input_size=224, max_samples=None, ssl="square-rot"):
         self.root = os.path.join(root_path, partition + '/')
         self.input_size = input_size
+        self.ssl = ssl
         assert os.path.exists(self.root), f"Data directory {self.root} does not exist."
         print(f"Loading dataset from {self.root}")
 
@@ -61,18 +62,28 @@ class BDDDualTaskDataset(Dataset):
     def __getitem__(self, idx):
         image, label = self.samples[idx]
         # Random rotation
-        # angle = random.uniform(0, 360)
-        angle = np.random.randint(0, 4) * 90
-        rotated = image.rotate(angle, resample=Image.BILINEAR)
+        if self.ssl == "square-rot":
+            angle = np.random.randint(0, 4) * 90
+            rotated = image.rotate(angle, resample=Image.BILINEAR)
+        elif self.ssl == "rot":
+            angle = np.random.randint(0, 360)
+            rotated = image.rotate(angle, resample=Image.BILINEAR)
 
         image_tensor = self.transform(image)
         image_rot_tensor = self.transform(rotated)
 
-        return {"image": image_tensor, 
-                "label": torch.tensor(label), 
-                "image_rot": image_rot_tensor, 
-                "angle": torch.tensor(angle // 90, dtype=torch.long)
-                }
+        if self.ssl == "square-rot":
+            return {"image": image_tensor, 
+                    "label": torch.tensor(label), 
+                    "image_rot": image_rot_tensor, 
+                    "angle": torch.tensor(angle // 90, dtype=torch.long) # Angle as class label (0, 1, 2, 3 for 0, 90, 180, 270 degrees)
+                    }
+        if self.ssl == "rot":
+            return {"image": image_tensor, 
+                    "label": torch.tensor(label), 
+                    "image_rot": image_rot_tensor, 
+                    "angle": torch.tensor(angle / 360, dtype=torch.float32) # Normalized angle in radians between 0 and 1
+                    }
 
 
 def prepare_BDD(image_dir, label_dir, save_path, input_size=224, num_samples=5_000):
