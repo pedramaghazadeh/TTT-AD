@@ -15,10 +15,10 @@ def train_epoch(model, dataloader, optimizer, device, ssl="square-rot", ttt=True
     cls_loss_fn = nn.CrossEntropyLoss()
 
     if ssl == "square-rot":
-        # For square-rot, we use CrossEntropyLoss for rotation prediction
+        # For square-rot, we use CrossEntropyLoss for rotation prediction 
         ssl_loss_fn = nn.CrossEntropyLoss()
     if ssl == "rot":
-        # For rot, we use MSELoss for rotation prediction
+        # For rot, we use MSELoss for rotation prediction (could not get good results)
         ssl_loss_fn = nn.MSELoss()
 
     total_cls_loss, total_ssl_loss = 0, 0
